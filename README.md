@@ -9,7 +9,7 @@ Replace `CALZX-DEV` below if your GitHub username differs:
 ```bash
 pkg update
 pkg install git bash
-git clone https://github.com/CALZX-DEV/CALZX-TERMUX.git
+git clone https://github.com/CALZX-DEV/CALZX-NEON.git
 cd CALZX-TERMUX
 bash install.sh
 ```

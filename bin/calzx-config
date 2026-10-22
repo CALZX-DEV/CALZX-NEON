@@ -1,0 +1,33 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+CONFIG="$HOME/.config/calzx/settings"
+mkdir -p "$(dirname "$CONFIG")"
+if [[ ! -f "$CONFIG" ]]; then
+  printf "CALZX_TITLE='CALZX'\nCALZX_SUBTITLE='NEON TERMINAL'\nCALZX_COLOR='cyan'\n" > "$CONFIG"
+fi
+# Load current values from a file created by this tool.
+source "$CONFIG"
+if [[ "${1:-}" == "--color" ]]; then
+  printf 'Choose color: cyan / purple / blue / green / yellow\nCurrent: %s\nNew color: ' "${CALZX_COLOR:-cyan}"
+  read -r color
+  case "$color" in cyan|purple|blue|green|yellow) ;; *) echo 'Invalid color; keeping current setting.'; exit 1;; esac
+  sed -i "s/^CALZX_COLOR=.*/CALZX_COLOR='$color'/" "$CONFIG"
+  echo "Color saved. Run calzx to preview."
+  exit 0
+fi
+printf 'Current banner name: %s\nNew banner name (letters/numbers, max 18): ' "${CALZX_TITLE:-CALZX}"
+read -r title
+title="${title//[^a-zA-Z0-9 _-]/}"
+title="${title:0:18}"
+[[ -n "$title" ]] || title='CALZX'
+printf 'New subtitle (max 40 characters, blank keeps current): '
+read -r subtitle
+subtitle="${subtitle//[^a-zA-Z0-9 _.-]/}"
+subtitle="${subtitle:0:40}"
+[[ -n "$subtitle" ]] || subtitle="${CALZX_SUBTITLE:-NEON TERMINAL}"
+cat > "$CONFIG" <<SETTINGS
+CALZX_TITLE='$title'
+CALZX_SUBTITLE='$subtitle'
+CALZX_COLOR='${CALZX_COLOR:-cyan}'
+SETTINGS
+echo 'Settings saved. Run calzx to preview.'

@@ -1,0 +1,66 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+CONFIG="$HOME/.config/calzx/settings"
+THEME="$HOME/.config/calzx/theme.sh"
+QUIET=0
+[[ "${1:-}" == "--quiet" ]] && QUIET=1
+if [[ -f "$CONFIG" ]]; then
+  # Settings are created by our own config utility.
+  source "$CONFIG"
+fi
+[[ -f "$THEME" ]] && source "$THEME"
+
+cyan=$'\033[1;96m'; purple=$'\033[1;95m'; blue=$'\033[1;94m'
+green=$'\033[1;92m'; yellow=$'\033[1;93m'; white=$'\033[1;97m'
+dim=$'\033[2m'; reset=$'\033[0m'
+case "${CALZX_COLOR:-cyan}" in
+  cyan) accent="$cyan";;
+  purple) accent="$purple";;
+  blue) accent="$blue";;
+  green) accent="$green";;
+  yellow) accent="$yellow";;
+  *) accent="$cyan";;
+esac
+clear_line() { printf '%s' "$reset"; }
+if (( QUIET == 0 )); then printf '\n'; fi
+printf '%s╔══════════════════════════════════════════════════╗%s\n' "$accent" "$reset"
+printf '%s║%s' "$accent" "$reset"
+title="${CALZX_TITLE:-CALZX}"
+# Large block-letter logo that stays readable without figlet.
+printf '  %s\n' "$white"
+printf '%s' "$accent"
+case "${title^^}" in
+  CALZX) cat <<'LOGO'
+   ██████╗  █████╗ ██╗     ███████╗██╗  ██╗
+  ██╔════╝ ██╔══██╗██║     ╚══███╔╝╚██╗██╔╝
+  ██║      ███████║██║       ███╔╝  ╚███╔╝
+  ██║      ██╔══██║██║      ███╔╝   ██╔██╗
+  ╚██████╗ ██║  ██║███████╗███████╗██╔╝ ██╗
+   ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
+LOGO
+    ;;
+  *) printf '  %s\n' "$title";;
+esac
+printf '%s║%s  %s%-43s%s║%s\n' "$accent" "$reset" "$white" "${CALZX_SUBTITLE:-NEON TERMINAL}" "$accent" "$reset"
+printf '%s╠══════════════════════════════════════════════════╣%s\n' "$accent" "$reset"
+printf '%s║%s  %sStatus:%s Ready      %sShell:%s Bash\n' "$accent" "$reset" "$green" "$reset" "$yellow" "$reset"
+printf '%s║%s  %sUser:%s %-12s %sDevice:%s Android/Termux\n' "$accent" "$reset" "$yellow" "$reset" "${USER:-user}" "$yellow" "$reset"
+printf '%s╠══════════════════════════════════════════════════╣%s\n' "$accent" "$reset"
+printf '%s║%s  %s[1]%s Change banner name     %s[2]%s Color settings\n' "$accent" "$reset" "$white" "$reset" "$white" "$reset"
+printf '%s║%s  %s[3]%s Open YouTube channel   %s[4]%s Exit\n' "$accent" "$reset" "$white" "$reset" "$white" "$reset"
+printf '%s╚══════════════════════════════════════════════════╝%s\n' "$accent" "$reset"
+if (( QUIET == 1 )); then return 0 2>/dev/null || exit 0; fi
+printf '\n%sChoose [1-4]: %s' "$accent" "$reset"
+read -r choice || choice=4
+case "$choice" in
+  1) command calzx-config;;
+  2) command calzx-config --color;;
+  3)
+     if command -v termux-open-url >/dev/null 2>&1; then
+       termux-open-url 'https://youtube.com/@calzxchannel'
+     else
+       printf 'Open: https://youtube.com/@calzxchannel\n'
+     fi
+     ;;
+  *) printf 'See you next time!\n';;
+esac

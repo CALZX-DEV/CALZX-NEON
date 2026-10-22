@@ -1,0 +1,19 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+BASHRC="$HOME/.bashrc"
+if [[ -f "$BASHRC" ]]; then
+  tmp="$(mktemp)"
+  awk '
+    /^# >>> CALZX TERMUX STARTUP >>>$/ {skip=1; next}
+    /^# <<< CALZX TERMUX STARTUP <<<$ / {skip=0; next}
+    /^# <<< CALZX TERMUX STARTUP <<</ {skip=0; next}
+    !skip {print}
+  ' "$BASHRC" > "$tmp"
+  cat "$tmp" > "$BASHRC"
+  rm -f "$tmp"
+fi
+rm -f "${PREFIX:-/data/data/com.termux/files/usr}/bin/calzx" \
+      "${PREFIX:-/data/data/com.termux/files/usr}/bin/calzx-config" \
+      "${PREFIX:-/data/data/com.termux/files/usr}/bin/calzx-uninstall"
+rm -rf "$HOME/.config/calzx"
+echo 'CALZX TERMUX commands and startup hook removed.'
